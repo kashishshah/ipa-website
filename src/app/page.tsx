@@ -29,6 +29,13 @@ import Carousel from "@/components/Carousel";
 import EventCards from "@/components/EventCards";
 import AboutSection from "@/components/AboutSection";
 import EventReviews from "@/components/EventReviews";
+import AboutIPA from "@/components/AboutIPA";
+import BecomeMember from "@/components/BecomeMember";
+import IPAChapters from "@/components/IPAChapters";
+import AccreditedPublications from "@/components/AccreditedPublications";
+import IPAMilestones from "@/components/IPAMilestones";
+import SocialMedia from "@/components/SocialMedia";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -355,6 +362,22 @@ export default function Home() {
         <div className="my-6">
           <EventReviews />
         </div>
+        <div className="my-6">
+          <AboutIPA />
+          <BecomeMember />
+        </div>
+        <div className="my-6">
+          <IPAChapters />
+          <AccreditedPublications />
+        </div>
+        <div className="my-6">
+          <IPAMilestones />
+        </div>
+        <div className="my-6">
+          <SocialMedia />
+          <BecomeMember />
+        </div>
+        <Footer />
       </main>
     </div>
   );
