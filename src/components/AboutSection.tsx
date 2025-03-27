@@ -91,7 +91,7 @@ const AboutSection = () => {
       />
 
       {/* Main content */}
-      <div className="relative flex flex-col md:flex-row items-center justify-center px-4 sm:px-8 lg:px-16 xl:px-24 max-w-7xl mx-auto">
+      <div className="relative flex flex-col md:flex-row items-center justify-center lg:px-16 xl:px-24 max-w-7xl mx-auto">
         {/* Left: Text Section */}
         <div className="w-full md:w-1/2 p-4 md:p-6 text-center md:text-left">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-900 mb-4">
