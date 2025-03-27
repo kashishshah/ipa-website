@@ -38,7 +38,7 @@ const AboutSection = () => {
     // Create a plane for the water effect
     const geometry = new THREE.PlaneGeometry(50, 10, 50, 50);
     const material = new THREE.MeshBasicMaterial({
-      color: 0x1e90ff, // Blue color for water
+      color: 0x1e90ff,
       wireframe: true,
       transparent: true,
       opacity: 0.3,
@@ -83,7 +83,7 @@ const AboutSection = () => {
   }, []);
 
   return (
-    <div className="relative w-full bg-blue-50 overflow-hidden py-5">
+    <div className="relative w-full bg-blue-50 overflow-hidden py-10 md:py-16">
       {/* Three.js water effect background */}
       <canvas
         ref={canvasRef}
@@ -91,47 +91,49 @@ const AboutSection = () => {
       />
 
       {/* Main content */}
-      <div className="relative flex items-center justify-center h-full px-6">
-        <div className="flex flex-col gap-2 md:flex-row items-center justify-between w-full max-w-6xl">
-          {/* Left: Text Section */}
-          <div className="md:w-1/2 p-6">
-            <h2 className="text-3xl font-bold text-blue-900 mb-4">
-              Indian Plumbing Association
-            </h2>
-            <p className="text-blue-700 mb-6">
-              {`Indian Plumbing Association is the NGO and an apex body of
-              plumbing professionals in India. Established in 1993, with the
-              objective to promote development of plumbing and building services
-              industry, IPA membership is open to everyone engaged directly or
-              indirectly with the construction industry. Indian Plumbing
-              Association (IPA) has 5000+ members, across the country from every
-              segment of the building industry including Consultancy,
-              Manufacturing, Contracting, Trading, Academia and Architecture.`}
-            </p>
-            <motion.button
-              variants={buttonVariants}
-              whileHover="hover"
-              whileTap="tap"
-              className="border border-blue-600 text-blue-600 hover:text-white px-6 py-2 rounded-full shadow-lg hover:bg-blue-700 transition"
-            >
-              Know More
-            </motion.button>
-          </div>
+      <div className="relative flex flex-col md:flex-row items-center justify-center px-4 sm:px-8 lg:px-16 xl:px-24 max-w-7xl mx-auto">
+        {/* Left: Text Section */}
+        <div className="w-full md:w-1/2 p-4 md:p-6 text-center md:text-left">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-900 mb-4">
+            Indian Plumbing Association
+          </h2>
+          <p className="text-sm sm:text-base lg:text-lg text-blue-700 mb-6 leading-relaxed">
+            {`Indian Plumbing Association is the NGO and an apex body of plumbing
+            professionals in India. Established in 1993, with the objective to
+            promote development of plumbing and building services industry, IPA
+            membership is open to everyone engaged directly or indirectly with
+            the construction industry. Indian Plumbing Association (IPA) has
+            5000+ members, across the country from every segment of the building
+            industry including Consultancy, Manufacturing, Contracting, Trading,
+            Academia and Architecture.`}
+          </p>
+          <motion.button
+            variants={buttonVariants}
+            whileHover="hover"
+            whileTap="tap"
+            className="border border-blue-600 text-blue-600 hover:text-white px-6 py-2 rounded-full shadow-lg hover:bg-blue-700 transition"
+          >
+            Know More
+          </motion.button>
+        </div>
 
-          {/* Right: Video Section */}
-          <div className="md:w-1/2 p-6 flex justify-center">
-            <motion.div variants={thumbnailVariants} whileHover="hover">
-              {/* Video Thumbnail */}
-              <iframe
-                width="560"
-                height="315"
-                src="https://www.youtube.com/embed/asp8ixCdmzY?si=j-65oUg306uFyOoE"
-                title="YouTube video player"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                className="rounded-lg"
-              ></iframe>
-            </motion.div>
-          </div>
+        {/* Right: Video Section */}
+        <div className="w-full md:w-1/2 flex justify-center p-4 md:p-6">
+          <motion.div
+            variants={thumbnailVariants}
+            whileHover="hover"
+            className="w-full max-w-lg"
+          >
+            {/* Video Thumbnail */}
+            <iframe
+              width="100%"
+              height="315"
+              src="https://www.youtube.com/embed/asp8ixCdmzY?si=j-65oUg306uFyOoE"
+              title="YouTube video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              className="rounded-lg shadow-lg"
+            ></iframe>
+          </motion.div>
         </div>
       </div>
     </div>

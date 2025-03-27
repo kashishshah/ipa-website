@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Calendar, MapPin, ExternalLink } from "lucide-react";
-import WaterBackground from "../shared/WaterBackground";
+import * as THREE from "three";
 
 // Card container animation
 const containerVariants = {
@@ -56,6 +56,159 @@ const buttonVariants = {
 
 const EventCards = () => {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number | null>(null);
+
+  // Three.js Water Simulation
+  useEffect(() => {
+    if (!canvasRef.current) return;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({
+      canvas: canvasRef.current,
+      alpha: true,
+    });
+
+    // Water particles setup
+    const particlesGeometry = new THREE.BufferGeometry();
+    const particlesCount = 100;
+    const positions = new Float32Array(particlesCount * 3);
+    const velocities = new Float32Array(particlesCount * 3);
+    const sizes = new Float32Array(particlesCount);
+
+    for (let i = 0; i < particlesCount; i++) {
+      // Random initial positions
+      positions[i * 3] = (Math.random() - 0.5) * 50;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+
+      // Random initial velocities
+      velocities[i * 3] = (Math.random() - 0.5) * 0.05;
+      velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.05;
+      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.05;
+
+      // Random sizes
+      sizes[i] = Math.random() * 0.5 + 0.1;
+    }
+
+    particlesGeometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(positions, 3)
+    );
+    particlesGeometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
+
+    // Create shader material for better water particles
+    const particlesMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        time: { value: 0 },
+        color: { value: new THREE.Color(0xd2ebfc) },
+      },
+      vertexShader: `
+          attribute float size;
+          uniform float time;
+          varying vec3 vPosition;
+          
+          void main() {
+            vPosition = position;
+            vec3 pos = position;
+            pos.y += sin(time * 0.5 + position.x) * 0.2;
+            pos.x += cos(time * 0.3 + position.z) * 0.1;
+            
+            vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+            gl_PointSize = size * (300.0 / -mvPosition.z);
+            gl_Position = projectionMatrix * mvPosition;
+          }
+        `,
+      fragmentShader: `
+          uniform vec3 color;
+          varying vec3 vPosition;
+          
+          void main() {
+            // Create circular particles
+            vec2 center = gl_PointCoord - vec2(0.5);
+            float dist = length(center);
+            if (dist > 0.5) discard;
+            
+            // Add radial gradient
+            float alpha = 1.0 - smoothstep(0.3, 0.5, dist);
+            
+            // Add some color variation based on position
+            vec3 finalColor = color + vec3(vPosition.x * 0.01, vPosition.y * 0.01, vPosition.z * 0.01);
+            
+            gl_FragColor = vec4(finalColor, alpha * 0.7);
+          }
+        `,
+      transparent: true,
+      depthWrite: false,
+    });
+
+    const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+    scene.add(particles);
+    camera.position.z = 10;
+
+    // Resize handler
+    const resizeRenderer = () => {
+      const width = canvasRef.current?.clientWidth || window.innerWidth;
+      const height = canvasRef.current?.clientHeight || 600;
+
+      renderer.setSize(width, height);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    };
+
+    // Animation loop
+    const clock = new THREE.Clock();
+    const animate = () => {
+      animationRef.current = requestAnimationFrame(animate);
+
+      // Update time uniform for shader
+      const elapsedTime = clock.getElapsedTime();
+      particlesMaterial.uniforms.time.value = elapsedTime;
+
+      // Animate particles
+      const positionAttribute = particlesGeometry.getAttribute("position");
+      for (let i = 0; i < particlesCount; i++) {
+        // Update particle positions
+        positionAttribute.array[i * 3] += velocities[i * 3];
+        positionAttribute.array[i * 3 + 1] += velocities[i * 3 + 1];
+        positionAttribute.array[i * 3 + 2] += velocities[i * 3 + 2];
+
+        // Bounce off boundaries
+        if (Math.abs(positionAttribute.array[i * 3]) > 25)
+          velocities[i * 3] *= -1;
+        if (Math.abs(positionAttribute.array[i * 3 + 1]) > 10)
+          velocities[i * 3 + 1] *= -1;
+        if (Math.abs(positionAttribute.array[i * 3 + 2]) > 5)
+          velocities[i * 3 + 2] *= -1;
+      }
+      positionAttribute.needsUpdate = true;
+
+      // Rotate the entire particle system slightly
+      particles.rotation.y = elapsedTime * 0.05;
+      particles.rotation.x = Math.sin(elapsedTime * 0.1) * 0.1;
+
+      renderer.render(scene, camera);
+    };
+
+    // Initial setup
+    resizeRenderer();
+    animate();
+
+    // Add resize listener
+    window.addEventListener("resize", resizeRenderer);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("resize", resizeRenderer);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      renderer.dispose();
+      particlesGeometry.dispose();
+      particlesMaterial.dispose();
+    };
+  }, []);
 
   // Event data
   const events = [
@@ -96,7 +249,10 @@ const EventCards = () => {
   return (
     <div className="relative w-full min-h-[600px] py-12 overflow-hidden bg-white">
       {/* Water background animation */}
-      <WaterBackground height={600} />
+      <canvas
+        ref={canvasRef}
+        className="absolute top-0 left-0 w-full h-full z-0"
+      />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4">
         {/* Section heading */}

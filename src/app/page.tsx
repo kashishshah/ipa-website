@@ -19,31 +19,19 @@ export default function Home() {
       {/* Header placeholder */}
       <Header />
       {/* Main content placeholder */}
-      <main className="container">
-        <div className="p-4 flex items-center justify-center">
+      <main>
+        <div className="py-4 flex items-center justify-center">
           <Carousel />
         </div>
-        <div className="my-6">
+        <div className="mt-6">
           <EventCards />
-        </div>
-        <div className="my-6">
           <AboutSection />
-        </div>
-        <div className="my-6">
           <EventReviews />
-        </div>
-        <div className="my-6">
           <AboutIPA />
           <BecomeMember />
-        </div>
-        <div className="my-6">
           <IPAChapters />
           <AccreditedPublications />
-        </div>
-        <div className="my-6">
           <IPAMilestones />
-        </div>
-        <div className="my-6">
           <SocialMedia />
           <BecomeMember />
         </div>

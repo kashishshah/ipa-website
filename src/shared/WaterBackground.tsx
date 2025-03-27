@@ -2,14 +2,13 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { Water } from "three/examples/jsm/objects/Water.js";
 
 interface WaterBackgroundProps {
   height?: number;
 }
 
 export default function WaterBackground({
-  height = 500,
+  height = 400,
 }: WaterBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -24,7 +23,7 @@ export default function WaterBackground({
       0.1,
       1000
     );
-    camera.position.set(0, 0, 30);
+    camera.position.set(0, 10, 30);
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({
@@ -36,76 +35,42 @@ export default function WaterBackground({
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    const ambientLight = new THREE.AmbientLight(0x99ccff, 0.8);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(5, 5, 5);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    directionalLight.position.set(5, 10, 5);
     scene.add(directionalLight);
 
-    // Water
-    const waterGeometry = new THREE.PlaneGeometry(100, 100, 128, 128);
-
-    // Water material with custom parameters for a more elegant look
-    const water = new Water(waterGeometry, {
-      textureWidth: 512,
-      textureHeight: 512,
-      waterNormals: new THREE.TextureLoader().load(
-        "/assets/waternormals.jpg",
-        (texture) => {
-          texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-        }
-      ),
-      sunDirection: new THREE.Vector3(0, 1, 0),
-      sunColor: 0xffffff,
-      waterColor: 0x1e90ff,
-      distortionScale: 2,
-      fog: false,
+    // Water surface
+    const waterGeometry = new THREE.PlaneGeometry(100, 100, 64, 64);
+    const waterMaterial = new THREE.MeshStandardMaterial({
+      color: 0x1e90ff,
+      roughness: 0.3,
+      metalness: 0.6,
+      side: THREE.DoubleSide,
     });
-
+    const water = new THREE.Mesh(waterGeometry, waterMaterial);
     water.rotation.x = -Math.PI / 2;
-    water.position.y = -5;
     scene.add(water);
 
-    // Add floating particles (water bubbles)
-    const particlesCount = 100;
-    const particlesGeometry = new THREE.BufferGeometry();
-    const particlePositions = new Float32Array(particlesCount * 3);
-    const particleSizes = new Float32Array(particlesCount);
+    // Floating bubbles
+    const bubblesCount = 80;
+    const bubblesGeometry = new THREE.BufferGeometry();
+    const bubblePositions = new Float32Array(bubblesCount * 3);
+    const bubbleVelocities = new Float32Array(bubblesCount);
 
-    for (let i = 0; i < particlesCount; i++) {
-      particlePositions[i * 3] = (Math.random() - 0.5) * 80;
-      particlePositions[i * 3 + 1] = (Math.random() - 0.5) * 40;
-      particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 40;
-      particleSizes[i] = Math.random() * 2 + 0.5;
+    for (let i = 0; i < bubblesCount; i++) {
+      bubblePositions[i * 3] = (Math.random() - 0.5) * 80;
+      bubblePositions[i * 3 + 1] = Math.random() * 10;
+      bubblePositions[i * 3 + 2] = (Math.random() - 0.5) * 80;
+      bubbleVelocities[i] = 0.02 + Math.random() * 0.05; // Random rising speed
     }
 
-    particlesGeometry.setAttribute(
+    bubblesGeometry.setAttribute(
       "position",
-      new THREE.BufferAttribute(particlePositions, 3)
+      new THREE.BufferAttribute(bubblePositions, 3)
     );
-    particlesGeometry.setAttribute(
-      "size",
-      new THREE.BufferAttribute(particleSizes, 1)
-    );
-
-    // Create a circular texture for particles
-    const particleTexture = new THREE.TextureLoader().load(
-      "/assets/circle.png"
-    );
-
-    const particlesMaterial = new THREE.PointsMaterial({
-      size: 1,
-      color: 0x87cefa,
-      map: particleTexture,
-      transparent: true,
-      opacity: 0.6,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    });
-
-    const particles = new THREE.Points(particlesGeometry, particlesMaterial);
-    scene.add(particles);
 
     // Animation loop
     const clock = new THREE.Clock();
@@ -113,16 +78,15 @@ export default function WaterBackground({
     const animate = () => {
       const elapsedTime = clock.getElapsedTime();
 
-      // Animate water
-      water.material.uniforms["time"].value += 1.0 / 60.0;
-
-      // Animate particles
-      const positions = particles.geometry.attributes.position.array;
-      for (let i = 0; i < particlesCount; i++) {
-        positions[i * 3 + 1] += Math.sin(elapsedTime + i * 0.1) * 0.02;
-        positions[i * 3] += Math.cos(elapsedTime + i * 0.1) * 0.02;
-      }
-      particles.geometry.attributes.position.needsUpdate = true;
+      // Simulate water movement
+      water.geometry.attributes.position.array.forEach((_, i) => {
+        const x = i % 10;
+        const y = Math.floor(i / 10);
+        water.geometry.attributes.position.array[i * 3 + 2] =
+          Math.sin(elapsedTime * 1.5 + x * 0.2) * 0.5 +
+          Math.cos(elapsedTime * 1.2 + y * 0.3) * 0.5;
+      });
+      water.geometry.attributes.position.needsUpdate = true;
 
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
