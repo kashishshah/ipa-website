@@ -197,7 +197,7 @@ const BecomeMember = () => {
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-blue-900 mb-4 tracking-tight">
             Become an IPA Member
           </h2>
-          <p className="text-blue-700 text-base sm:text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
+          <p className="text-blue-700 text-base sm:text-lg max-w-2xl mx-auto mb-8 leading-relaxed text-justify md:text-center">
             Full Membership is for representative organizations in the plumbing
             industry, including trade associations, professional bodies, trade
             unions, registration/licensing bodies and manufacturer/wholesaler

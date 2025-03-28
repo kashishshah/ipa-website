@@ -97,7 +97,7 @@ const AboutSection = () => {
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-900 mb-4">
             Indian Plumbing Association
           </h2>
-          <p className="text-sm sm:text-base lg:text-lg text-blue-700 mb-6 leading-relaxed">
+          <p className="text-sm sm:text-base lg:text-lg text-blue-700 mb-6 leading-relaxed text-justify">
             {`Indian Plumbing Association is the NGO and an apex body of plumbing
             professionals in India. Established in 1993, with the objective to
             promote development of plumbing and building services industry, IPA
